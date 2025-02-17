@@ -16,7 +16,7 @@ function ModelSelect() {
     setMode( selectMode )
   }
   return (
-    <FormControl sx={ { m: 1, minWidth: 120 } } size="small">
+    <FormControl size="small">
       <InputLabel id="label-select-dark-light-mode">Mode</InputLabel>
       <Select
         labelId="label-select-dark-light-mode"
@@ -26,10 +26,14 @@ function ModelSelect() {
         onChange={ handleChange }
       >
         <MenuItem value={ 'light' }>
-          <div style={ { display: 'flex', alignItems: 'center', gap: '8px' } }>
+          <Box sx={ {
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1
+          } }>
             <LightModeIcon />
             Light
-          </div>
+          </Box>
         </MenuItem>
         <MenuItem value={ 'dark' }>
           <Box sx={ {
