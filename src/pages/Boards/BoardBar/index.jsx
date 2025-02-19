@@ -35,6 +35,7 @@ function BoardBar() {
       paddingX: 2,
       gap: 2,
       overflowX: 'auto',
+      '&::-webkit-scrollbar-track': { m: 2 },
       bgcolor: ( theme ) => ( theme.palette.mode === 'dark' ? '#34495e' : '#1976d2' ),
       borderBottom: '1px solid white'
     } }>
@@ -91,7 +92,10 @@ function BoardBar() {
               width: '34px',
               height: '34px',
               fontSize: '16px',
-              border: 'none'
+              border: 'none',
+              color: 'white',
+              cursor: 'pointer',
+              '&:first-of-type': { bgcolor: '#a4b0be' }
             }
           } }
         >
