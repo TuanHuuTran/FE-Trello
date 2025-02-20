@@ -39,7 +39,7 @@ module.exports = {
     'indent': ['warn', 2],
     'semi': [1, 'never'],
     'quotes': ['error', 'single'],
-    'array-bracket-spacing': 1,
+    'array-bracket-spacing': 0,
     'linebreak-style': 0,
     'no-unexpected-multiline': 'warn',
     'keyword-spacing': 1,
