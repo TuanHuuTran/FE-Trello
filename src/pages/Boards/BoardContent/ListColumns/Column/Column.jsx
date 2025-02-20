@@ -19,16 +19,34 @@ import DragHandleIcon from '@mui/icons-material/DragHandle'
 import ListCards from './ListCards/ListCards'
 import theme from '~/theme'
 import { mapOrder } from '~/utils/sort'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 
 function Column( { column } ) {
+  const { attributes, listeners, setNodeRef, transform, transition, } = useSortable( {
+    id: column._id,
+    data: { ...column }
+  } )
+
+  const dndKitColumnStyle = {
+    // touchAction: 'none', // Dành cho PointerSensor default
+    transform: CSS.Translate.toString( transform ),
+    transition
+  }
+
   const orderCards = mapOrder( column?.cards, column?.cardOrderIds, '_id' )
   const [ anchorEl, setAnchorEl ] = useState( null )
   const open = Boolean( anchorEl )
   const handleClick = ( event ) => { setAnchorEl( event.currentTarget ) }
   const handleClose = () => { setAnchorEl( null ) }
+
   return (
     < Box
+      ref={ setNodeRef }
+      style={ dndKitColumnStyle }
+      { ...attributes }
+      { ...listeners }
       sx={ {
         minWidth: '300px',
         maxWidth: '300px',
