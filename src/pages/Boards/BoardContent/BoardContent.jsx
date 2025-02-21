@@ -17,10 +17,11 @@ import {
   getFirstCollision
 } from '@dnd-kit/core'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, isEmpty } from 'lodash'
 import { arrayMove } from '@dnd-kit/sortable'
 import Column from './ListColumns/Column/Column'
 import Card from './ListColumns/Column/ListCards/Card/Card'
+import { generatePlaceholderCard } from '~/utils/formaters'
 
 const ACTIVE_DRAG_ITEM_TYPE = {
   COLUMN: 'ACTIVE_DRAG_ITEM_TYPE_COLUMN',
@@ -89,9 +90,16 @@ function BoardContent( { board } ) {
       const nextColumn = cloneDeep( prevColumn )
       const nextActiveColumn = nextColumn.find( column => column._id === activeColumn._id )
       const nextOverColumn = nextColumn.find( column => column._id === overColumn._id )
+
+
       if ( nextActiveColumn ) {
         // Xóa card ở active column
         nextActiveColumn.cards = nextActiveColumn.cards.filter( card => card._id !== activeDraggingCardId )
+
+        // Tạo placeholder card khi column không có card
+        if ( isEmpty( nextActiveColumn.cards ) ) {
+          nextActiveColumn.cards = [ generatePlaceholderCard( nextActiveColumn ) ]
+        }
         // Cập nhật lại mảng cardOrderIds cho đúng giữ liệu
         nextActiveColumn.cardOrderIds = nextActiveColumn.cards.map( card => card._id )
       }
@@ -100,6 +108,9 @@ function BoardContent( { board } ) {
         nextOverColumn.cards = nextOverColumn.cards.filter( card => card._id !== activeDraggingCardId )
         // Thêm cái card đang kéo vào overColumn theo vị trí index mới
         nextOverColumn.cards = nextOverColumn.cards.toSpliced( newCardIndex, 0, activeDraggingCardData )
+
+        // Xóa cái placeholder Card nếu đang tồn tại 1 card chính thống
+        nextOverColumn.cards = nextOverColumn.cards.filter( card => !card.FE_PlaceholderCard )
         // Cập nhật lại mảng cardOrderIds cho đúng giữ liệu
         nextOverColumn.cardOrderIds = nextOverColumn.cards.map( card => card._id )
       }
