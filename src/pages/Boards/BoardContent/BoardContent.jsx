@@ -5,14 +5,18 @@ import {
   DndContext,
   useSensor,
   useSensors,
-  PointerSensor,
+  // PointerSensor,
   MouseSensor,
   TouchSensor,
   DragOverlay,
   defaultDropAnimationSideEffects,
-  closestCorners
+  closestCorners,
+  // closestCenter,
+  pointerWithin,
+  // rectIntersection,
+  getFirstCollision
 } from '@dnd-kit/core'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { cloneDeep } from 'lodash'
 import { arrayMove } from '@dnd-kit/sortable'
 import Column from './ListColumns/Column/Column'
@@ -45,10 +49,11 @@ function BoardContent( { board } ) {
   const [ activeDragItemType, setActiveDragItemType ] = useState( null )
   const [ activeDragItemData, setActiveDragItemData ] = useState( null )
 
+  // Điểm cuối cùng phát hiện của thuật toán va chạm
+  const lastOverId = useRef( null )
+
   // Lưu trữ giữ liệu gốc
   const [ oldColumnWhenDraggingCard, setOldColumnWhenDraggingCard ] = useState( null )
-
-
 
   useEffect( () => {
     setOrderedColumns( mapOrder( board?.columns, board?.columnOrderIds, '_id' ) )
@@ -105,7 +110,6 @@ function BoardContent( { board } ) {
 
   //Trigger khi bắt đầu drag một phần tử
   const handleDragStart = ( event ) => {
-    console.log( 'handleDragStart', event )
     setActiveDragItemId( event?.active?.id )
     setActiveDragItemType( event?.active?.data?.current?.columnId ? ACTIVE_DRAG_ITEM_TYPE.CARD : ACTIVE_DRAG_ITEM_TYPE.COLUMN )
     setActiveDragItemData( event?.active?.data?.current )
@@ -241,11 +245,51 @@ function BoardContent( { board } ) {
   const dropAnimation = {
     sideEffects: defaultDropAnimationSideEffects( { styles: { active: { opacity: '0.5' } } } )
   }
+
+  const collisionDetectionStrategy = useCallback( ( args ) => {
+    if ( activeDragItemType === ACTIVE_DRAG_ITEM_TYPE.COLUMN ) {
+      return closestCorners( { ...args } )
+    }
+    //Tìm các điểm va chạm , giao nhau. Trả về một mảng các va chạm - intersection với con tró
+    const pointerIntersections = pointerWithin( args )
+
+    // Kéo một card lớn, có chưa image ra khỏi vùng kéo thả thì return
+    if ( !pointerIntersections?.length ) return
+
+    // Thuật toán phát hiện va chạm sẽ trả về một mảng các va chạm
+    // const intersections = !!pointerIntersections?.length
+    //   ? pointerIntersections
+    //   : rectIntersection( args )
+
+
+    // Tìm overId đầu tiên trong đám pointerIntersections ở trên
+    let overId = getFirstCollision( pointerIntersections, 'id' )
+    if ( overId ) {
+      // nếu không có đoạn checkColumn này thì bug flickering vẫn fix nhma giật lag
+      const checkColumn = orderedColumns.find( column => column._id === overId )
+      if ( checkColumn ) {
+        overId = closestCorners( {
+          ...args,
+          droppableContainers: args.droppableContainers.filter( container => {
+            return ( container.id !== overId ) && ( checkColumn?.cardOrderIds?.includes( container.id ) )
+          } )
+        } )[ 0 ]?.id
+      }
+      lastOverId.current = overId
+      return [ { id: overId } ]
+    }
+    //  Nếu overID là null trả về 1 mảng rỗng
+    return lastOverId.current ? [ { id: lastOverId } ] : []
+  }, [ activeDragItemType, orderedColumns ] )
+
+
   return (
     <DndContext
       sensors={ sensors }
       // Thuật toán phát hiện va chạm
-      collisionDetection={ closestCorners }
+      // collisionDetection={ closestCorners }
+      collisionDetection={ collisionDetectionStrategy }
+
       onDragStart={ handleDragStart }
       onDragOver={ handleDragOver }
       onDragEnd={ handleDragEnd }
