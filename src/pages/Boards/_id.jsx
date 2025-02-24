@@ -5,7 +5,7 @@ import BoardContent from './BoardContent/BoardContent'
 import { useEffect, useState } from 'react'
 
 
-import { createColumnAPI, fetchBoardDetailAPI, createCardAPI } from '~/apis'
+import { createColumnAPI, fetchBoardDetailAPI, createCardAPI, updateBoardDetailAPI } from '~/apis'
 import { toast } from 'react-toastify'
 import { generatePlaceholderCard } from '~/utils/formaters'
 import { isEmpty } from 'lodash'
@@ -53,7 +53,24 @@ function Board() {
       setBoard( newBoard )
       toast.success( ' Created Card Success!' )
     }
-  }// Call APIs
+  }
+
+  const moveColumn = async ( dndOrderedColumns ) => {
+    // Update chuan du lieu state board
+    const dndOrderedColumnsIds = dndOrderedColumns.map( ( c ) => c._id )
+    const newBoard = { ...board }
+    newBoard.columns = dndOrderedColumns
+    newBoard.columnOrderIds = dndOrderedColumnsIds
+    setBoard( newBoard )
+
+    // Call API
+    await updateBoardDetailAPI( newBoard._id, { columnOrderIds: dndOrderedColumnsIds } )
+    // if ( updateBoard ) {
+    //   setBoard( updateBoard )
+    // }
+  }
+
+  // Call APIs
   // useEffect( () => {
   //   listBoard()
   // }, [] )
@@ -100,6 +117,7 @@ function Board() {
         board={ board }
         createColumn={ createColumn }
         createCard={ createCard }
+        moveColumn={ moveColumn }
       />
     </Container>
   )
