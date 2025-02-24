@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { toast } from 'react-toastify'
 import Box from '@mui/material/Box'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
@@ -27,7 +28,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
 
-function Column( { column } ) {
+function Column( { column, createCard } ) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable( {
     id: column._id,
     data: { ...column }
@@ -49,13 +50,15 @@ function Column( { column } ) {
   const toggleOpenNewCardForm = () => setOpenNewCardForm( !openNewCardForm )
   const [ newCardTitle, setNewCardTitle ] = useState( '' )
 
-  const addNewCard = () => {
+  const addNewCard = async () => {
     if ( !newCardTitle ) {
-      console.error( 'please Card title' )
+      toast.error( 'Please Input Title!' )
     }
-    console.log( newCardTitle )
-
-    // Gọi APIs
+    const newCard = {
+      title: newCardTitle,
+      columnId: column._id
+    }
+    await createCard( newCard )
     //Đóng trạng thái thêm Card mới & clear input
     toggleOpenNewCardForm()
     setNewCardTitle( '' )

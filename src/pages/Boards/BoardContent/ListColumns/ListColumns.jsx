@@ -7,19 +7,23 @@ import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortabl
 import { useState } from 'react'
 import TextField from '@mui/material/TextField'
 import CloseIcon from '@mui/icons-material/Close'
+import { createColumnAPI } from '~/apis'
 
 
-function ListColumns( { columns } ) {
+function ListColumns( { columns, createColumn, createCard } ) {
   const [ openNewColumnForm, setOpenNewColumnForm ] = useState( false )
   const toggleOpenNewColumnForm = () => setOpenNewColumnForm( !openNewColumnForm )
   const [ newColumnTitle, setNewColumnTitle ] = useState( '' )
 
-  const addNewColumn = () => {
+  const addNewColumn = async () => {
     if ( !newColumnTitle ) {
       toast.error( 'Please enter title column!' )
     }
-    console.log( newColumnTitle )
 
+    const newColumn = {
+      title: newColumnTitle
+    }
+    await createColumn( newColumn )
     // Gọi APIs
     //Đóng trạng thái thêm column mới & clear input
     toggleOpenNewColumnForm()
@@ -38,7 +42,7 @@ function ListColumns( { columns } ) {
         '&::-webkit-scrollbar-track': { m: 2 }
       } }>
         {/* <Column /> */ }
-        { columns?.map( ( column ) => ( <Column key={ column._id } column={ column } /> ) ) }
+        { columns?.map( ( column ) => ( <Column key={ column._id } column={ column } createCard={ createCard } /> ) ) }
         {/*Box Add New Column */ }
 
         { !openNewColumnForm ?
