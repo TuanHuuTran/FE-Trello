@@ -29,7 +29,7 @@ const ACTIVE_DRAG_ITEM_TYPE = {
   CARD: 'ACTIVE_DRAG_ITEM_TYPE_CARD'
 }
 
-function BoardContent( { board, createColumn, createCard } ) {
+function BoardContent( { board, createColumn, createCard, moveColumn } ) {
 
 
   // const pointerSensor = useSensor( PointerSensor, { activationConstraint: { distance: 10 } } )
@@ -242,6 +242,7 @@ function BoardContent( { board, createColumn, createCard } ) {
         // Code https://github.com/clauderic/dnd-kit/blob/master/packages/sortable/src/utilities/arrayMove.ts
         const dndOrderedColumns = arrayMove( orderedColumns, oldColumnIndex, newColumnIndex )
         //cập nhật lại status
+        moveColumn( dndOrderedColumns )
         setOrderedColumns( dndOrderedColumns )
         // const dndOrderedColumnsIds = dndOrderedColumns.map( ( c ) => c._id )
         // console.log( "dndOrder", dndOrderedColumns )
