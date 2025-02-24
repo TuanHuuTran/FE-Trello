@@ -1,3 +1,4 @@
+import { toast } from 'react-toastify'
 import Box from '@mui/material/Box'
 import Column from './Column/Column'
 import Button from '@mui/material/Button'
@@ -15,7 +16,7 @@ function ListColumns( { columns } ) {
 
   const addNewColumn = () => {
     if ( !newColumnTitle ) {
-      console.error( 'please column title' )
+      toast.error( 'Please enter title column!' )
     }
     console.log( newColumnTitle )
 
