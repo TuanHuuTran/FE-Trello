@@ -29,7 +29,7 @@ const ACTIVE_DRAG_ITEM_TYPE = {
   CARD: 'ACTIVE_DRAG_ITEM_TYPE_CARD'
 }
 
-function BoardContent( { board, createColumn, createCard, moveColumn } ) {
+function BoardContent( { board, createColumn, createCard, moveColumn, moveCardInTheSameColumn } ) {
 
 
   // const pointerSensor = useSensor( PointerSensor, { activationConstraint: { distance: 10 } } )
@@ -59,7 +59,7 @@ function BoardContent( { board, createColumn, createCard, moveColumn } ) {
   const [ oldColumnWhenDraggingCard, setOldColumnWhenDraggingCard ] = useState( null )
 
   useEffect( () => {
-    setOrderedColumns( mapOrder( board?.columns, board?.columnOrderIds, '_id' ) )
+    setOrderedColumns( board.columns )
   }, [ board ] )
 
   // Tìm một cái Column theo CardId
@@ -211,10 +211,9 @@ function BoardContent( { board, createColumn, createCard, moveColumn } ) {
         const oldCardIndex = oldColumnWhenDraggingCard?.cards?.findIndex( ( c ) => c._id === activeDragItemId )
         //lấy vị trí mới (từ thằng over)
         const newCardIndex = overColumn?.cards?.findIndex( ( c ) => c._id === overCardId )
-
         //Dùng arrayMove gì kéo card trong column giống kéo column trong board
         const dndOrderedCards = arrayMove( oldColumnWhenDraggingCard?.cards, oldCardIndex, newCardIndex )
-
+        const dndOrderedCardIds = dndOrderedCards.map( card => card._id )
         setOrderedColumns( prevColumn => {
           const nextColumn = cloneDeep( prevColumn )
 
@@ -223,11 +222,12 @@ function BoardContent( { board, createColumn, createCard, moveColumn } ) {
 
           // Cập nhật lại giá trị cho card và cardOrderIds trong các targetColumn
           targetColumn.cards = dndOrderedCards
-          targetColumn.cardOrderIds = dndOrderedCards.map( card => card._id )
+          targetColumn.cardOrderIds = dndOrderedCardIds
 
           //Trả về giá trị state mới chuẩn vị trí
           return nextColumn
         } )
+        moveCardInTheSameColumn( dndOrderedCards, dndOrderedCardIds, oldColumnWhenDraggingCard._id )
       }
     }
 
@@ -242,8 +242,8 @@ function BoardContent( { board, createColumn, createCard, moveColumn } ) {
         // Code https://github.com/clauderic/dnd-kit/blob/master/packages/sortable/src/utilities/arrayMove.ts
         const dndOrderedColumns = arrayMove( orderedColumns, oldColumnIndex, newColumnIndex )
         //cập nhật lại status
-        moveColumn( dndOrderedColumns )
         setOrderedColumns( dndOrderedColumns )
+        moveColumn( dndOrderedColumns )
         // const dndOrderedColumnsIds = dndOrderedColumns.map( ( c ) => c._id )
         // console.log( "dndOrder", dndOrderedColumns )
         // console.log( "dndOrderedColumnsIds", dndOrderedColumnsIds )

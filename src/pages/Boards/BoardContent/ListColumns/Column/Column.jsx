@@ -44,13 +44,13 @@ function Column( { column, createCard } ) {
     opacity: isDragging ? 0.5 : undefined
   }
 
-  const orderCards = mapOrder( column?.cards, column?.cardOrderIds, '_id' )
+  const orderCards = column.cards
 
   const [ openNewCardForm, setOpenNewCardForm ] = useState( false )
   const toggleOpenNewCardForm = () => setOpenNewCardForm( !openNewCardForm )
   const [ newCardTitle, setNewCardTitle ] = useState( '' )
 
-  const addNewCard = async () => {
+  const addNewCard = () => {
     if ( !newCardTitle ) {
       toast.error( 'Please Input Title!' )
     }
@@ -58,7 +58,7 @@ function Column( { column, createCard } ) {
       title: newCardTitle,
       columnId: column._id
     }
-    await createCard( newCard )
+    createCard( newCard )
     //Đóng trạng thái thêm Card mới & clear input
     toggleOpenNewCardForm()
     setNewCardTitle( '' )
