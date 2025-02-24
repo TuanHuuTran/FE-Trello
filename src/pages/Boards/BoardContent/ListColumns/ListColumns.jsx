@@ -7,7 +7,6 @@ import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortabl
 import { useState } from 'react'
 import TextField from '@mui/material/TextField'
 import CloseIcon from '@mui/icons-material/Close'
-import { createColumnAPI } from '~/apis'
 
 
 function ListColumns( { columns, createColumn, createCard } ) {
@@ -15,7 +14,7 @@ function ListColumns( { columns, createColumn, createCard } ) {
   const toggleOpenNewColumnForm = () => setOpenNewColumnForm( !openNewColumnForm )
   const [ newColumnTitle, setNewColumnTitle ] = useState( '' )
 
-  const addNewColumn = async () => {
+  const addNewColumn = () => {
     if ( !newColumnTitle ) {
       toast.error( 'Please enter title column!' )
     }
@@ -23,7 +22,7 @@ function ListColumns( { columns, createColumn, createCard } ) {
     const newColumn = {
       title: newColumnTitle
     }
-    await createColumn( newColumn )
+    createColumn( newColumn )
     // Gọi APIs
     //Đóng trạng thái thêm column mới & clear input
     toggleOpenNewColumnForm()
