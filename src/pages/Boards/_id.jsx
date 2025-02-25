@@ -9,7 +9,8 @@ import {
   fetchBoardDetailAPI,
   createCardAPI,
   updateBoardDetailAPI,
-  updateColumnDetailAPI
+  updateColumnDetailAPI,
+  moveCardToDifferentColumnAPI
 } from '~/apis'
 import { toast } from 'react-toastify'
 import { generatePlaceholderCard } from '~/utils/formaters'
@@ -59,10 +60,14 @@ function Board() {
       ...newCard,
       boardId: board._id
     } )
-    if ( card ) {
-      const newBoard = { ...board }
-      const columnToUpdate = newBoard.columns.find( column => card.columnId === column._id )
-      if ( columnToUpdate ) {
+
+    const newBoard = { ...board }
+    const columnToUpdate = newBoard.columns.find( column => card.columnId === column._id )
+    if ( columnToUpdate ) {
+      if ( columnToUpdate.cards.some( card => card.FE_PlaceholderCard ) ) {
+        columnToUpdate.cards = [ card ]
+        columnToUpdate.cardOrderIds = [ card._id ]
+      } else {
         columnToUpdate.cards.push( card )
         columnToUpdate.cardOrderIds.push( card._id )
       }
@@ -94,7 +99,33 @@ function Board() {
     }
     setBoard( newBoard )
     // Gọi API
-    // updateColumnDetailAPI( columnId, { cardOrderIds: dndOrderedCardIds } )
+    updateColumnDetailAPI( columnId, { cardOrderIds: dndOrderedCardIds } )
+  }
+
+  /**
+   * B1: Cập nhật bảng cardOrderIds của column chứa nó ( xóa khỏi column )
+   * B2: Cập nhật bảng cardOrderIds của column tiếp theo ( thêm mới vào column )
+   * B3: Cập nhật lại trường columnId mới
+   * => Tạo API riêng
+   */
+  const moveCardToDifferentColumn = ( currentCardId, prevColumnId, nextColumnId, dndOrderedColumns ) => {
+    const dndOrderedColumnsIds = dndOrderedColumns.map( ( c ) => c._id )
+    const newBoard = { ...board }
+    newBoard.columns = dndOrderedColumns
+    newBoard.columnOrderIds = dndOrderedColumnsIds
+    setBoard( newBoard )
+
+    // Goi API
+    let prevCardOrderIds = dndOrderedColumns.find( c => c._id === prevColumnId ).cardOrderIds
+    if ( prevCardOrderIds[ 0 ].includes( 'placeholder-card' ) ) prevCardOrderIds = []
+    moveCardToDifferentColumnAPI( {
+      currentCardId,
+      prevColumnId,
+      prevCardOrderIds,
+      nextColumnId,
+      nextCardOrderIds: dndOrderedColumns.find( c => c._id === nextColumnId ).cardOrderIds
+    } )
+
   }
 
   if ( !board ) {
@@ -161,6 +192,7 @@ function Board() {
         createCard={ createCard }
         moveColumn={ moveColumn }
         moveCardInTheSameColumn={ moveCardInTheSameColumn }
+        moveCardToDifferentColumn={ moveCardToDifferentColumn }
       />
     </Container>
   )
