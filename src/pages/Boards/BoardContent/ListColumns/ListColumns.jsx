@@ -9,7 +9,7 @@ import TextField from '@mui/material/TextField'
 import CloseIcon from '@mui/icons-material/Close'
 
 
-function ListColumns( { columns, createColumn, createCard } ) {
+function ListColumns( { columns, createColumn, createCard, deleteColumn } ) {
   const [ openNewColumnForm, setOpenNewColumnForm ] = useState( false )
   const toggleOpenNewColumnForm = () => setOpenNewColumnForm( !openNewColumnForm )
   const [ newColumnTitle, setNewColumnTitle ] = useState( '' )
@@ -41,7 +41,7 @@ function ListColumns( { columns, createColumn, createCard } ) {
         '&::-webkit-scrollbar-track': { m: 2 }
       } }>
         {/* <Column /> */ }
-        { columns?.map( ( column ) => ( <Column key={ column._id } column={ column } createCard={ createCard } /> ) ) }
+        { columns?.map( ( column ) => ( <Column key={ column._id } column={ column } createCard={ createCard } deleteColumn={ deleteColumn } /> ) ) }
         {/*Box Add New Column */ }
 
         { !openNewColumnForm ?
