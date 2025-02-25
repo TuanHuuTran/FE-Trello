@@ -10,7 +10,8 @@ import {
   createCardAPI,
   updateBoardDetailAPI,
   updateColumnDetailAPI,
-  moveCardToDifferentColumnAPI
+  moveCardToDifferentColumnAPI,
+  deleteColumnDetailAPI
 } from '~/apis'
 import { toast } from 'react-toastify'
 import { generatePlaceholderCard } from '~/utils/formaters'
@@ -125,7 +126,19 @@ function Board() {
       nextColumnId,
       nextCardOrderIds: dndOrderedColumns.find( c => c._id === nextColumnId ).cardOrderIds
     } )
+  }
 
+  const deleteColumn = ( columnId ) => {
+    // Update chuan du lieu state board
+    const newBoard = { ...board }
+    newBoard.columns = newBoard.columns.filter( c => c._id !== columnId )
+    newBoard.columnOrderIds = newBoard.columnOrderIds.filter( _id => _id !== columnId )
+    setBoard( newBoard )
+
+    // Call API
+    deleteColumnDetailAPI( columnId ).then( res => {
+      toast.success( res?.deleteResult )
+    } )
   }
 
   if ( !board ) {
@@ -193,6 +206,7 @@ function Board() {
         moveColumn={ moveColumn }
         moveCardInTheSameColumn={ moveCardInTheSameColumn }
         moveCardToDifferentColumn={ moveCardToDifferentColumn }
+        deleteColumn={ deleteColumn }
       />
     </Container>
   )

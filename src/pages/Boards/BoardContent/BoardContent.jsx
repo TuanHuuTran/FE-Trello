@@ -34,7 +34,8 @@ function BoardContent( { board,
   createCard,
   moveColumn,
   moveCardInTheSameColumn,
-  moveCardToDifferentColumn
+  moveCardToDifferentColumn,
+  deleteColumn
 } ) {
 
 
@@ -337,6 +338,7 @@ function BoardContent( { board,
           columns={ orderedColumns }
           createColumn={ createColumn }
           createCard={ createCard }
+          deleteColumn={ deleteColumn }
         />
         <DragOverlay dropAnimation={ dropAnimation }>
           { !activeDragItemType && null }
