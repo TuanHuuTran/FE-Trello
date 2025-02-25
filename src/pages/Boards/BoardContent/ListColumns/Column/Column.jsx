@@ -89,7 +89,7 @@ function Column( { column, createCard, deleteColumn } ) {
   const handleClose = () => { setAnchorEl( null ) }
 
   return (
-    // Phải bọc div vì vấn đề chiều cao của column khi kéo sẽ có kiểu flickering 
+    // Phải bọc div vì vấn đề chiều cao của column khi kéo sẽ có kiểu flickering
     <div ref={ setNodeRef } style={ dndKitColumnStyle } { ...attributes }>
       < Box
         { ...listeners }
