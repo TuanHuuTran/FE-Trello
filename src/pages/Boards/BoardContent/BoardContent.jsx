@@ -29,12 +29,9 @@ const ACTIVE_DRAG_ITEM_TYPE = {
 }
 
 function BoardContent( { board,
-  createColumn,
-  createCard,
   moveColumn,
   moveCardInTheSameColumn,
-  moveCardToDifferentColumn,
-  deleteColumn
+  moveCardToDifferentColumn
 } ) {
 
 
@@ -335,9 +332,6 @@ function BoardContent( { board,
       } }>
         <ListColumns
           columns={ orderedColumns }
-          createColumn={ createColumn }
-          createCard={ createCard }
-          deleteColumn={ deleteColumn }
         />
         <DragOverlay dropAnimation={ dropAnimation }>
           { !activeDragItemType && null }

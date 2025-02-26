@@ -20,13 +20,19 @@ import DragHandleIcon from '@mui/icons-material/DragHandle'
 import ListCards from './ListCards/ListCards'
 import CloseIcon from '@mui/icons-material/Close'
 import TextField from '@mui/material/TextField'
-
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-
 import { useConfirm } from 'material-ui-confirm'
+import { createCardAPI, deleteColumnDetailAPI } from '~/apis'
+import { cloneDeep } from 'lodash'
+import { selectCurrentActiveBoard, updateCurrentActiveBoard } from '~/redux/activeBoard/activeBoardSlice'
+import { useDispatch, useSelector } from 'react-redux'
 
-function Column( { column, createCard, deleteColumn } ) {
+function Column( { column } ) {
+
+  const dispatch = useDispatch()
+  const board = useSelector( selectCurrentActiveBoard )
+
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable( {
     id: column._id,
     data: { ...column }
@@ -48,7 +54,7 @@ function Column( { column, createCard, deleteColumn } ) {
   const toggleOpenNewCardForm = () => setOpenNewCardForm( !openNewCardForm )
   const [ newCardTitle, setNewCardTitle ] = useState( '' )
 
-  const addNewCard = () => {
+  const addNewCard = async () => {
     if ( !newCardTitle ) {
       toast.error( 'Please Input Title!' )
     }
@@ -56,7 +62,25 @@ function Column( { column, createCard, deleteColumn } ) {
       title: newCardTitle,
       columnId: column._id
     }
-    createCard( newCard )
+    // Call API
+    const card = await createCardAPI( {
+      ...newCard,
+      boardId: board._id
+    } )
+    // Tương tự với createNewColumn dùng cloneDeep()
+    const newBoard = cloneDeep( board )
+    const columnToUpdate = newBoard.columns.find( column => card.columnId === column._id )
+    if ( columnToUpdate ) {
+      if ( columnToUpdate.cards.some( card => card.FE_PlaceholderCard ) ) {
+        columnToUpdate.cards = [ card ]
+        columnToUpdate.cardOrderIds = [ card._id ]
+      } else {
+        columnToUpdate.cards.push( card )
+        columnToUpdate.cardOrderIds.push( card._id )
+      }
+    }
+    dispatch( updateCurrentActiveBoard( newBoard ) )
+
     //Đóng trạng thái thêm Card mới & clear input
     toggleOpenNewCardForm()
     setNewCardTitle( '' )
@@ -78,7 +102,16 @@ function Column( { column, createCard, deleteColumn } ) {
       // confirmationKeyword: 'tuan'
     }
     ).then( () => {
-      deleteColumn( column._id )
+      // Update chuan du lieu state board
+      const newBoard = { ...board }
+      newBoard.columns = newBoard.columns.filter( c => c._id !== column._id )
+      newBoard.columnOrderIds = newBoard.columnOrderIds.filter( _id => _id !== column._id )
+      dispatch( updateCurrentActiveBoard( newBoard ) )
+
+      // Call API
+      deleteColumnDetailAPI( column._id ).then( res => {
+        toast.success( res?.deleteResult )
+      } )
     } )
       .catch()
   }
