@@ -7,14 +7,20 @@ import { SortableContext, horizontalListSortingStrategy } from '@dnd-kit/sortabl
 import { useState } from 'react'
 import TextField from '@mui/material/TextField'
 import CloseIcon from '@mui/icons-material/Close'
+import { createColumnAPI } from '~/apis'
+import { cloneDeep } from 'lodash'
+import { selectCurrentActiveBoard, updateCurrentActiveBoard } from '~/redux/activeBoard/activeBoardSlice'
+import { useDispatch, useSelector } from 'react-redux'
 
 
-function ListColumns( { columns, createColumn, createCard, deleteColumn } ) {
+function ListColumns( { columns } ) {
+  const dispatch = useDispatch()
+  const board = useSelector( selectCurrentActiveBoard )
   const [ openNewColumnForm, setOpenNewColumnForm ] = useState( false )
   const toggleOpenNewColumnForm = () => setOpenNewColumnForm( !openNewColumnForm )
   const [ newColumnTitle, setNewColumnTitle ] = useState( '' )
 
-  const addNewColumn = () => {
+  const addNewColumn = async () => {
     if ( !newColumnTitle ) {
       toast.error( 'Please enter title column!' )
     }
@@ -22,7 +28,33 @@ function ListColumns( { columns, createColumn, createCard, deleteColumn } ) {
     const newColumn = {
       title: newColumnTitle
     }
-    createColumn( newColumn )
+
+    // Call API
+    const column = await createColumnAPI( {
+      ...newColumn,
+      boardId: board._id
+    } )
+
+    /***
+     * Cách 1:
+     * Đoạn này dính lỗi object is not extensible bởi dù đã copy/clone ra giá trị mới nhưng bản chất của
+     * spread operator là shallow Copy/clone nên dính phải Rules Immutability trong ReduxTookit.
+     */
+    const newBoard = cloneDeep( board )
+    newBoard.columns.push( column )
+    newBoard.columnOrderIds.push( column._id )
+    dispatch( updateCurrentActiveBoard( newBoard ) )
+
+    /**
+     *  Cách 2:
+     *Ngoài ra có thể dùng array.concat thay cho push như docs của Redux Tookit ở trên vì push sẽ thay đổi giá trị mảng trực tiếp
+    còn concat thì nó merge - ghép mảng lại tạo ra mảng mới để chúng ta gán lại giá trị nên không vấn đề gì.
+    const newBoard = { ...board }
+    newBoard.columns = newBoard.columns.concat( [ column ] )
+    newBoard.columnOrderIds = newBoard.columnOrderIds.concat( [ column._id ] )
+    dispatch( updateCurrentActiveBoard( newBoard ) )
+     */
+
     // Gọi APIs
     //Đóng trạng thái thêm column mới & clear input
     toggleOpenNewColumnForm()
@@ -41,7 +73,7 @@ function ListColumns( { columns, createColumn, createCard, deleteColumn } ) {
         '&::-webkit-scrollbar-track': { m: 2 }
       } }>
         {/* <Column /> */ }
-        { columns?.map( ( column ) => ( <Column key={ column._id } column={ column } createCard={ createCard } deleteColumn={ deleteColumn } /> ) ) }
+        { columns?.map( ( column ) => ( <Column key={ column._id } column={ column } /> ) ) }
         {/*Box Add New Column */ }
 
         { !openNewColumnForm ?
