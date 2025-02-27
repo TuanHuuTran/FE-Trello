@@ -40,7 +40,7 @@ export const activeBoardSlice = createSlice({
   extraReducers: (builder) => {
     builder.addCase(fetchBoardDetailAPI.fulfilled, (state, action) => {
       // action.payload ở đây chính là res.data trả về ở trên
-      const board = action.payload
+      let board = action.payload
 
       // Xử lý dữ liệu nếu cần thiết...
       board.columns = mapOrder( board.columns, board.columnOrderIds, '_id' )
