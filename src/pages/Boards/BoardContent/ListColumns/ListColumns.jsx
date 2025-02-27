@@ -130,7 +130,11 @@ function ListColumns( { columns } ) {
               } }
             />
             <Box sx={ { display: 'flex', alignItems: 'center', gap: 1 } }>
-              <Button variant="contained" color="success" size="small"
+              <Button
+                className='interceptor-loading'
+                variant="contained"
+                color="success"
+                size="small"
                 sx={ {
                   boxShadow: 'none',
                   border: '0.5px solid',
