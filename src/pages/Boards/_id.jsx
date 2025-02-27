@@ -19,16 +19,15 @@ import {
   selectCurrentActiveBoard
 } from '~/redux/activeBoard/activeBoardSlice'
 import { useDispatch, useSelector } from 'react-redux'
+import { useParams } from 'react-router-dom'
 
 
 function Board() {
   const dispatch = useDispatch()
-  // Không dùng state của components nữa mà dùng của Redux
-  // const [ board, setBoard ] = useState( null )
   const board = useSelector( selectCurrentActiveBoard )
+  const { boardId } = useParams()
 
   useEffect( () => {
-    const boardId = '67bad895f32682458041b898'
     // Call API
     dispatch( fetchBoardDetailAPI( boardId ) )
   }, [ dispatch ] )
