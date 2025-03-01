@@ -3,10 +3,10 @@ import authorizedAxiosInstance from '~/utils/authorizeAxios'
 import { API_ROOT } from '~/utils/constants'
 
 
-// export const fetchBoardDetailAPI = async (boardId) => {
-//   const response = await axios.get(`${API_ROOT}/v1/boards/${boardId}`)
-//   return response.data
-// }
+export const fetchBoardsAPI = async (searchPath) => {
+  const response = await authorizedAxiosInstance.get(`${API_ROOT}/v1/boards${searchPath}`)
+  return response.data
+}
 
 export const updateBoardDetailAPI = async (boardId, updateData) => {
   const response = await authorizedAxiosInstance.put(`${API_ROOT}/v1/boards/${boardId}`, updateData)
@@ -57,3 +57,4 @@ export const refreshTokenAPI = async () => {
   const response = await authorizedAxiosInstance.get(`${API_ROOT}/v1/users/refresh_token`)
   return response.data
 }
+
