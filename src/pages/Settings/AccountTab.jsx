@@ -76,12 +76,24 @@ function AccountTab() {
     let reqData = new FormData()
     reqData.append( 'avatar', e.target?.files[ 0 ] )
     // Cách để log được dữ liệu thông qua FormData
-    console.log( 'reqData: ', reqData )
-    for ( const value of reqData.values() ) {
-      console.log( 'reqData Value: ', value )
-    }
+    // console.log( 'reqData: ', reqData )
+    // for ( const value of reqData.values() ) {
+    //   console.log( 'reqData Value: ', value )
+    // }
 
     // Gọi API...
+    toast.promise(
+      dispatch( updateUserAPI( reqData ) ),
+      { pending: 'Updating...' }
+    )
+      .then( res => {
+        // Đoạn này phải kiểm tra không có lỗi update thì mới thuc hien cac hanh dong can thiet
+        if ( !res.error ) {
+          toast.success( 'User updated successfully!' )
+        }
+        // luu y du co loi hay thanh cong cung can phai clear file input, neu khong thi se khong the chon cung 1 file lien tiep duoc
+        e.target.value = ''
+      } )
   }
 
   return (

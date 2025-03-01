@@ -8,6 +8,7 @@ import AccountVerification from '~/pages/Auth/AccountVerification'
 import { useSelector } from 'react-redux'
 import { selectCurrentUser } from '~/redux/user/userSlice'
 import Settings from '~/pages/Settings/Settings'
+import Boards from '~/pages/Boards'
 
 
 /**
@@ -32,6 +33,8 @@ function App() {
       {/*Protected Route: Hiểu đơn giản là những route chỉ truy cập được sau khi login*/ }
       <Route element={ <ProtectedRoute user={ currentUser } /> }>
         < Route path='/boards/:boardId' element={ <Board /> } />
+
+        < Route path='/boards' element={ <Boards /> } />
 
         {/*Setting route */ }
         < Route path='/settings/account' element={ <Settings /> } />
