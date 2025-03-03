@@ -23,10 +23,11 @@ import TextField from '@mui/material/TextField'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useConfirm } from 'material-ui-confirm'
-import { createCardAPI, deleteColumnDetailAPI } from '~/apis'
+import { createCardAPI, deleteColumnDetailAPI, updateColumnDetailAPI } from '~/apis'
 import { cloneDeep } from 'lodash'
 import { selectCurrentActiveBoard, updateCurrentActiveBoard } from '~/redux/activeBoard/activeBoardSlice'
 import { useDispatch, useSelector } from 'react-redux'
+import ToggleFocusInput from '~/components/Form/ToggleFocusInput'
 
 function Column( { column } ) {
 
@@ -116,6 +117,17 @@ function Column( { column } ) {
       .catch()
   }
 
+  const updateColumnTitle = ( newTitle ) => {
+    // Call API updateColumn va xu ly du lieu board trong redux
+    updateColumnDetailAPI( column._id, { title: newTitle } ).then( () => {
+      const newBoard = cloneDeep( board )
+      const columnToUpdate = newBoard.columns.find( c => c._id === column._id )
+      if ( columnToUpdate ) {
+        columnToUpdate.title = newTitle
+      }
+      dispatch( updateCurrentActiveBoard( newBoard ) )
+    } )
+  }
   const [ anchorEl, setAnchorEl ] = useState( null )
   const open = Boolean( anchorEl )
   const handleClick = ( event ) => { setAnchorEl( event.currentTarget ) }
@@ -147,13 +159,11 @@ function Column( { column } ) {
             justifyContent: 'space-between'
           } }
         >
-          <Typography sx={ {
-            fontSize: '1rem !important',
-            fontWeight: 'bold',
-            cursor: 'pointer'
-          } }>
-            { column?.title }
-          </Typography>
+          < ToggleFocusInput
+            value={ column?.title }
+            onChangedValue={ updateColumnTitle }
+            data-no-dnd="true"
+          />
           <Box>
             <Tooltip title="More options">
               <ExpandMoreIcon
