@@ -87,6 +87,7 @@ function BoardBar( { board } ) {
         </Button>
         {/* xu ly danh sach thanh vien group */ }
         <BoardUserGroup
+          boardUsers={ board?.FE_allUsers }
         />
       </Box>
     </Box>
