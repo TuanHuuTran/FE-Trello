@@ -33,7 +33,7 @@ import CardDescriptionMdEditor from './CardDescriptionMdEditor'
 import CardActivitySection from './CardActivitySection'
 import { styled } from '@mui/material/styles'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateCurrentActiveCard, selectCurrentActiveCard, clearCurrentActiveCard } from '~/redux/activeCard/activeCardSlide'
+import { updateCurrentActiveCard, selectCurrentActiveCard, clearAndHideCurrentActiveCard, selectIsShowModalActiveCard } from '~/redux/activeCard/activeCardSlide'
 import { updateCardDetailsAPI } from '~/apis'
 import { updateCardInboard } from '~/redux/activeBoard/activeBoardSlice'
 
@@ -64,11 +64,13 @@ const SidebarItem = styled( Box )( ( { theme } ) => ( {
 function ActiveCard() {
   const dispatch = useDispatch()
   const activeCard = useSelector( selectCurrentActiveCard )
+  const isShowModalActiveCard = useSelector( selectIsShowModalActiveCard )
+
   // Không dùng state đóng mở modal nữa vì dùng redux
   // const [ isOpen, setIsOpen ] = useState( true )
   // const handleOpenModal = () => setIsOpen( true )
   const handleCloseModal = () => {
-    dispatch( clearCurrentActiveCard() )
+    dispatch( clearAndHideCurrentActiveCard() )
   }
 
   // Function dùng chung cho các trường hợp update card: title, description...
@@ -110,10 +112,15 @@ function ActiveCard() {
 
   }
 
+  // Dung async để components CardActivitySection chờ và nếu thành công thì mới clear thẻ input comment
+  const onAddCartComment = async ( commentToAdd ) => {
+    await callAPIUpdateCard( { commentToAdd } )
+  }
+
   return (
     <Modal
       disableScrollLock
-      open={ true }
+      open={ isShowModalActiveCard }
       onClose={ handleCloseModal } // Sử dụng onClose trong trường hợp muốn đóng Modal bằng nút ESC hoặc click ra ngoài Modal
       sx={ { overflowY: 'auto' } }>
       <Box sx={ {
@@ -175,7 +182,7 @@ function ActiveCard() {
 
               {/* Feature 03: Xử lý mô tả của Card */ }
               <CardDescriptionMdEditor
-                cardDescriptionProp={ activeCard.description }
+                cardDescriptionProp={ activeCard?.description }
                 handleUpdateCardDescription={ onUpdateCardDescription }
               />
             </Box>
@@ -187,7 +194,10 @@ function ActiveCard() {
               </Box>
 
               {/* Feature 04: Xử lý các hành động, ví dụ comment vào Card */ }
-              <CardActivitySection />
+              <CardActivitySection
+                cardComments={ activeCard?.comments }
+                onAddCardComment={ onAddCartComment }
+              />
             </Box>
           </Grid>
 
