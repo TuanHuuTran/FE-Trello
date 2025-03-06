@@ -12,7 +12,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
 import { useDispatch } from 'react-redux'
-import { updateCurrentActiveCard } from '~/redux/activeCard/activeCardSlide'
+import { showModalActiveCard, updateCurrentActiveCard } from '~/redux/activeCard/activeCardSlide'
 
 function Card( { card } ) {
   const dispatch = useDispatch()
@@ -35,6 +35,8 @@ function Card( { card } ) {
   const setActiveCard = () => {
     // Cập nhật data cho activeCardredux
     dispatch( updateCurrentActiveCard( card ) )
+    // Hiên modal activeCard
+    dispatch( showModalActiveCard() )
   }
   return (
     <MuiCard
