@@ -23,11 +23,17 @@ const persistor = persistStore( store )
 // Kỹ thuật Inject Store: Sử dụng redux bên ngoài phạm vi component
 import { injectStore } from '~/utils/authorizeAxios.js'
 injectStore( store )
-ReactDOM.createRoot( document.getElementById( 'root' ) ).render(
 
-  <BrowserRouter basename='/'>
-    <Provider store={ store }>
-      <PersistGate persistor={ persistor }>
+// config socket io with client
+import { io } from 'socket.io-client'
+import { API_ROOT } from './utils/constants.js'
+export const socketIoInstance = io( API_ROOT )
+
+
+ReactDOM.createRoot( document.getElementById( 'root' ) ).render(
+  <Provider store={ store }>
+    <PersistGate persistor={ persistor }>
+      <BrowserRouter basename='/'>
         <CssVarsProvider theme={ theme }>
           <ConfirmProvider defaultOptions={ {
             allowClose: false,
@@ -41,7 +47,7 @@ ReactDOM.createRoot( document.getElementById( 'root' ) ).render(
             <ToastContainer position="top-right" theme="colored" />
           </ConfirmProvider>
         </CssVarsProvider>
-      </PersistGate>
-    </Provider>
-  </BrowserRouter>
+      </BrowserRouter>
+    </PersistGate>
+  </Provider>
 )
