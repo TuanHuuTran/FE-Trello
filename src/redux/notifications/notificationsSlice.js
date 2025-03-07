@@ -52,7 +52,7 @@ export const notificationsSlice = createSlice({
       state.currentNotifications = Array.isArray(inComingInvitations) ? inComingInvitations.reverse() : []
     })
     build.addCase(updateBoardInvitationAPI.fulfilled, (state, action) => {
-      let inComingInvitations = action.payload
+      const inComingInvitations = action.payload
       // Cap nhat lai giu lieu BoardInvitation (ben trong no se co status moi sau khi update)
       const getInvitation = state.currentNotifications.find(i => i._id === inComingInvitations._id)
       getInvitation.boardInvitation = inComingInvitations.boardInvitation
