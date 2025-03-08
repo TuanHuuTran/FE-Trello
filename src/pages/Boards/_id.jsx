@@ -27,7 +27,7 @@ function Board() {
   useEffect( () => {
     // Call API
     dispatch( fetchBoardDetailAPI( boardId ) )
-  }, [ dispatch ] )
+  }, [ dispatch, boardId ] )
 
   const moveColumn = ( dndOrderedColumns ) => {
     // Update chuan du lieu state board
